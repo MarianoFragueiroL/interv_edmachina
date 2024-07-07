@@ -1,28 +1,33 @@
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 from typing import List
 from app.models.student import Student
 from app.schemas.student import StudentCreate
-from app.crud.subjects import get_subjects_by_ids
+from app.models.subject import Subject
 
-students_db = []
+def create_student(db: Session, student: StudentCreate) -> Student:
+    db_student = Student(name=student.name)
+    db.add(db_student)
+    db.commit()
+    db.refresh(db_student)
+    return db_student
 
-def create_student(student: StudentCreate) -> Student:
-    new_student = Student(id=len(students_db) + 1, **student.dict())
-    students_db.append(new_student)
-    return new_student
+def get_students(db: Session) -> List[Student]:
+    return db.query(Student).all()
 
-def get_students() -> List[Student]:
-    return students_db
-
-def update_student_subjects(student_id: int, subject_ids: List[int]) -> Student:
-    student = next((s for s in students_db if s.id == student_id), None)
+def update_student_subjects(db: Session, student_id: int, subject_ids: List[int]) -> Student:
+    student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         raise HTTPException(status_code=404, detail="Student not found")
-    
-    subjects = get_subjects_by_ids(subject_ids)
+
+    subjects = db.query(Subject).filter(Subject.id.in_(subject_ids)).all()
     student.subjects = subjects
+    db.commit()
+    db.refresh(student)
     return student
 
-def delete_student(student_id: int) -> None:
-    global students_db
-    students_db = [s for s in students_db if s.id != student_id]
+def delete_student(db: Session, student_id: int) -> None:
+    student = db.query(Student).filter(Student.id == student_id).first()
+    if student:
+        db.delete(student)
+        db.commit()

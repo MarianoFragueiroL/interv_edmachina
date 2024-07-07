@@ -1,8 +1,17 @@
-from pydantic import BaseModel
-from typing import List
-from app.models.subject import Subject
+from sqlalchemy import Column, Integer, String, Table, ForeignKey
+from sqlalchemy.orm import relationship
+from app.db.base import Base
 
-class Student(BaseModel):
-    id: int
-    name: str
-    subjects: List[Subject] = []
+student_subject_association = Table(
+    'student_subject', Base.metadata,
+    Column('student_id', Integer, ForeignKey('students.id')),
+    Column('subject_id', Integer, ForeignKey('subjects.id')),
+    extend_existing=True
+)
+
+class Student(Base):
+    __tablename__ = 'students'
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+    subjects = relationship("Subject", secondary=student_subject_association, back_populates="students")

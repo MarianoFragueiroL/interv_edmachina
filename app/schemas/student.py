@@ -1,6 +1,12 @@
+from typing import List, Optional
 from pydantic import BaseModel
-from typing import List
-from app.schemas.subject import Subject
+
+class Subject(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
 
 class StudentBase(BaseModel):
     name: str
