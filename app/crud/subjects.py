@@ -10,8 +10,8 @@ def create_subject(db: Session, subject: SubjectCreate) -> Subject:
     db.refresh(db_subject)
     return db_subject
 
-def get_subjects(db: Session) -> List[Subject]:
-    return db.query(Subject).all()
+def fetch_subjects(db: Session, skip: int = 0, limit: int = 10) -> List[Subject]:
+    return db.query(Subject).offset(skip).limit(limit).all()
 
 def delete_subject(db: Session, subject_id: int) -> None:
     subject = db.query(Subject).filter(Subject.id == subject_id).first()

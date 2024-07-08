@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from sqlalchemy.orm import Session
 from app.schemas.subject import Subject, SubjectCreate
-from app.crud.subjects import create_subject as crud_create_subject, get_subjects, delete_subject
+from app.crud.subjects import create_subject as crud_create_subject, fetch_subjects, delete_subject
 from app.db.session import SessionLocal
 
 router = APIRouter()
@@ -19,8 +19,8 @@ def create_subject(subject: SubjectCreate, db: Session = Depends(get_db)):
     return crud_create_subject(db, subject)
 
 @router.get("/", response_model=List[Subject])
-def read_subjects(db: Session = Depends(get_db)):
-    return get_subjects(db)
+def get_students(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    return fetch_subjects(db, skip=skip, limit=limit)
 
 @router.delete("/{subject_id}", response_model=dict)
 def remove_subject(subject_id: int, db: Session = Depends(get_db)):
