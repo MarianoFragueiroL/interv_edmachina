@@ -14,4 +14,4 @@ class Student(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
-    subjects = relationship("Subject", secondary=student_subject_association, back_populates="students")
+    subjects = relationship("Subject", secondary=student_subject_association)

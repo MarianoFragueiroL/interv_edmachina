@@ -1,18 +1,12 @@
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel
-
-class Subject(BaseModel):
-    id: int
-    name: str
-
-    class Config:
-        orm_mode = True
+from .subject import Subject
 
 class StudentBase(BaseModel):
     name: str
 
 class StudentCreate(StudentBase):
-    pass
+    subjects: List[int] = []
 
 class Student(StudentBase):
     id: int

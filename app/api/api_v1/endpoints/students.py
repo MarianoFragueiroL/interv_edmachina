@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from typing import List
 from sqlalchemy.orm import Session
 from app.schemas.student import Student, StudentCreate
-from app.crud.students import create_student as crud_create_student, get_students, delete_student, update_student_subjects
+from app.crud.students import create_student as crud_create_student, fetch_students, delete_student, update_student_subjects
 from app.db.session import SessionLocal
 
 router = APIRouter()
@@ -19,8 +19,9 @@ def create_student(student: StudentCreate, db: Session = Depends(get_db)):
     return crud_create_student(db, student)
 
 @router.get("/", response_model=List[Student])
-def read_students(db: Session = Depends(get_db)):
-    return get_students(db)
+def get_students(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    students = fetch_students(db, skip=skip, limit=limit)
+    return students
 
 @router.put("/{student_id}/subjects", response_model=Student)
 def add_subjects_to_student(student_id: int, subject_ids: List[int], db: Session = Depends(get_db)):
