@@ -1,9 +1,19 @@
 from fastapi import FastAPI
 from app.api.api_v1.api import api_router
+from app.db.session import engine, Base
 
-app = FastAPI()
+def init_db():
+    Base.metadata.create_all(bind=engine)
 
-app.include_router(api_router, prefix="/api")
+def create_app() -> FastAPI:
+    app = FastAPI()
+    init_db()
+
+    app.include_router(api_router, prefix="/api")
+
+    return app
+
+app = create_app()
 
 @app.get("/")
 def read_root():
