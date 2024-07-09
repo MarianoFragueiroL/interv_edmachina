@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from app.models.student_subject import StudentSubject
 
 
-def create_student(db: Session, student: StudentCreate) -> Students:
+def create_student(db: Session, student: StudentCreate) -> Student:
     try:
         db_student = Student(
             name=student.name,
@@ -22,13 +22,15 @@ def create_student(db: Session, student: StudentCreate) -> Students:
         db.add(db_student)
         db.commit()
         db.refresh(db_student)
-        
+
         if student.subjects:
             for subject_id in student.subjects:
-                student_subject = StudentSubject(student_id=db_student.id, subject_id=subject_id)
-                db.add(student_subject)
+                subject = db.query(Subject).filter(Subject.id == subject_id).first()
+                if subject:
+                    db_student_subject = StudentSubject(student_id=db_student.id, subject_id=subject_id)
+                    db.add(db_student_subject)
             db.commit()
-        
+
         db.refresh(db_student)
         return db_student
     except Exception as e:
