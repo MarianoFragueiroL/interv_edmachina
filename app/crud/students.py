@@ -35,7 +35,7 @@ def create_student(db: Session, student: StudentCreate) -> Students:
         db.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-def fetch_students(db: Session, skip: int = 0, limit: int = 10) -> List[Students]:
+def fetch_students(db: Session, skip: int = 0, limit: int = 10) -> List[Student]:
     students = db.query(Student).offset(skip).limit(limit).all()
     return students
 
@@ -61,7 +61,7 @@ def delete_student(db: Session, student_id: int) -> None:
         db.delete(student)
         db.commit()
 
-def fetch_student(db: Session, student_id: int) -> StudentDetails:
+def fetch_student(db: Session, student_id: int) :
     student = db.query(Student).filter(Student.id == student_id).first()
     if not student:
         return None

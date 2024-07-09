@@ -6,7 +6,7 @@ from datetime import datetime
 
 class StudentCreate(BaseModel):
     name: str
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     address: Optional[str] = None
     phone: Optional[str] = None
     career: Optional[str] = None
@@ -19,7 +19,7 @@ class StudentCreate(BaseModel):
 class StudentDetails(BaseModel):
     id: int
     name: str
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
     address: Optional[str] = None
     phone: Optional[str] = None
     career: Optional[str] = None
