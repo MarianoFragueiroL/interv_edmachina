@@ -19,6 +19,13 @@ This is a sample FastAPI project.
    ```bash
    docker-compose up --build
 
+2. In local run migrations to create tables:
+   Make sure you have the following pakages:
+      - pip install alembic sqlalchemy psycopg2
+
+   Then run the following command:
+      - alembic upgrade head
+
 # FastAPI Students and Subjects API
 
 This API allows managing students and subjects using FastAPI. Below are the available endpoints.
