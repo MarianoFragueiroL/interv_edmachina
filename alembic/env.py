@@ -3,7 +3,6 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
 
-
 # This is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -12,9 +11,9 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-# Importa la base y los modelos
+# Import the base and all models
 from app.db.base import Base
-from app.models import student, subject
+from app.models import student, subject, student_subject
 
 target_metadata = Base.metadata
 
