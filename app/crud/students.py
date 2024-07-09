@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.models.student import Student
 from app.models.subject import Subject
-from app.schemas.student import StudentCreate, StudentDetails, Students
+from app.schemas.student import StudentCreate, StudentDetails, Students, StudentUpdate
 from datetime import datetime, timezone
 from app.models.student_subject import StudentSubject
 
@@ -39,22 +39,30 @@ def fetch_students(db: Session, skip: int = 0, limit: int = 10) -> List[Student]
     students = db.query(Student).offset(skip).limit(limit).all()
     return students
 
-def update_student_subjects(db: Session, student_id: int, subject_ids: List[int]) -> StudentDetails:
-    student = db.query(Student).filter(Student.id == student_id).first()
-    if not student:
-        raise HTTPException(status_code=404, detail="Student not found")
+def update_student(db: Session, student_id: int, student_update: StudentUpdate) -> StudentDetails:
+    try:
+        student = db.query(Student).filter(Student.id == student_id).first()
+        if not student:
+            raise HTTPException(status_code=404, detail="Student not found")
+        
+        update_data = student_update.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            if key != "subjects":
+                setattr(student, key, value)
 
-    db.query(StudentSubject).filter(StudentSubject.student_id == student_id).delete()
+        if "subjects" in update_data:
+            subject_ids = update_data["subjects"]
+            db.query(StudentSubject).filter(StudentSubject.student_id == student_id).delete()
+            if subject_ids:
+                for subject_id in subject_ids:
+                    student_subject = StudentSubject(student_id=student_id, subject_id=subject_id)
+                    db.add(student_subject)
 
-    if subject_ids:
-        for subject_id in subject_ids:
-            student_subject = StudentSubject(student_id=student_id, subject_id=subject_id)
-            db.add(student_subject)
-    
-    db.commit()
-    db.refresh(student)
-    return student
-
+        db.commit()
+        db.refresh(student)
+        return student
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 def delete_student(db: Session, student_id: int) -> None:
     student = db.query(Student).filter(Student.id == student_id).first()
     if student:

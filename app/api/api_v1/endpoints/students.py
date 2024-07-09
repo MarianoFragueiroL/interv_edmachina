@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from sqlalchemy.orm import Session
-from app.schemas.student import Students, StudentCreate, StudentDetails
-from app.crud.students import create_student as create_student, fetch_students, delete_student, update_student_subjects, fetch_student
+from app.schemas.student import Students, StudentCreate, StudentDetails, StudentUpdate
+from app.crud.students import create_student as create_student, fetch_students, delete_student, update_student, fetch_student
 from app.db.session import SessionLocal
 
 router = APIRouter()
@@ -30,12 +30,10 @@ def get_students_endpoint(skip: int = 0, limit: int = 10, db: Session = Depends(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@router.put("/{student_id}/subjects", response_model=StudentDetails)
-def add_subjects_to_student_endpoint(student_id: int, subject_ids: List[int], db: Session = Depends(get_db)):
-    try:
-        return update_student_subjects(db, student_id, subject_ids)
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+@router.put("/{student_id}", response_model=StudentDetails)
+def update_student_endpoint(student_id: int, student_update: StudentUpdate, db: Session = Depends(get_db)):
+     return update_student(db, student_id, student_update)
+
 
 @router.delete("/{student_id}", response_model=dict)
 def remove_student_endpoint(student_id: int, db: Session = Depends(get_db)):

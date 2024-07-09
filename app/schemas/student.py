@@ -37,3 +37,12 @@ class Students(BaseModel):
 
     class Config:
         orm_mode = True
+
+class StudentUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    address: Optional[str] = None
+    phone: Optional[str] = None
+    career: Optional[str] = None
+    subject_repeats: Optional[int] = None
+    subjects: Optional[List[int]] = None
