@@ -18,3 +18,5 @@ def delete_subject(db: Session, subject_id: int) -> None:
     if subject:
         db.delete(subject)
         db.commit()
+        return True
+    return False

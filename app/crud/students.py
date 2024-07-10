@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from app.models.student import Student
 from app.models.subject import Subject
-from app.schemas.student import StudentCreate, StudentDetails, Students, StudentUpdate
+from app.schemas.student import StudentCreate, StudentDetails, StudentUpdate
 from datetime import datetime, timezone
 from app.models.student_subject import StudentSubject
 
@@ -42,11 +42,10 @@ def fetch_students(db: Session, skip: int = 0, limit: int = 10) -> List[Student]
     return students
 
 def update_student(db: Session, student_id: int, student_update: StudentUpdate) -> StudentDetails:
-    try:
         student = db.query(Student).filter(Student.id == student_id).first()
         if not student:
-            raise HTTPException(status_code=404, detail="Student not found")
-        
+            return False
+
         update_data = student_update.dict(exclude_unset=True)
         for key, value in update_data.items():
             if key != "subjects":
@@ -63,13 +62,15 @@ def update_student(db: Session, student_id: int, student_update: StudentUpdate) 
         db.commit()
         db.refresh(student)
         return student
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-def delete_student(db: Session, student_id: int) -> None:
+
+def delete_student(db: Session, student_id: int):
     student = db.query(Student).filter(Student.id == student_id).first()
+    print(student)
     if student:
         db.delete(student)
         db.commit()
+        return True
+    return False
 
 def fetch_student(db: Session, student_id: int) :
     student = db.query(Student).filter(Student.id == student_id).first()

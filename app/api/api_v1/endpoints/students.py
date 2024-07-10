@@ -38,8 +38,10 @@ def update_student_endpoint(student_id: int, student_update: StudentUpdate, db: 
 @router.delete("/{student_id}", response_model=dict)
 def remove_student_endpoint(student_id: int, db: Session = Depends(get_db)):
     try:
-        delete_student(db, student_id)
-        return {"message": "Student deleted successfully"}
+        response = delete_student(db, student_id)
+        if response:
+            return {"message": "Student deleted successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 

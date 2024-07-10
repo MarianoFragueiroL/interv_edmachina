@@ -31,7 +31,9 @@ def get_subjects_endpoint(skip: int = 0, limit: int = 10, db: Session = Depends(
 @router.delete("/{subject_id}", response_model=dict)
 def remove_subject_endpoint(subject_id: int, db: Session = Depends(get_db)):
     try:
-        delete_subject(db, subject_id)
-        return {"message": "Subject deleted successfully"}
+        response = delete_subject(db, subject_id)
+        if response:
+            return {"message": "Subject deleted successfully"}
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subject not found")
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
